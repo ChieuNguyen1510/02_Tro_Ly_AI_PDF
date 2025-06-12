@@ -149,6 +149,7 @@ if not pdf_files:
     st.stop()
 
 selected_pdf_name = st.selectbox("📄 Chọn file PDF từ Google Drive:", list(pdf_files.keys()))
+selected_pdf = selected_pdf_name
 selected_file = pdf_files[selected_pdf_name]
 
 # ========== TẢI FILE VỀ VÀ ĐỌC ==========
