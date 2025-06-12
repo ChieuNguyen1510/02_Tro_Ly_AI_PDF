@@ -155,7 +155,7 @@ selected_file = pdf_files[selected_pdf_name]
 selected_file.GetContentFile(selected_pdf_name)
 pdf_context = extract_text_from_pdf_path(selected_pdf_name)
 
-<<<<<<< HEAD
+# <<<<<<< HEAD
 # Đọc nội dung system từ txt
 base_system = rfile("01.system_trainning.txt")
 
