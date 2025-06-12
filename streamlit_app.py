@@ -52,25 +52,28 @@ st.markdown(f"""<h1 style="text-align: center; font-size: 24px; border-bottom: 2
 openai_api_key = st.secrets.get("OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 
-# ======= COPY FILE TỪ Document → Document1 =======
-src_folder = "Document"
+# 📤 Tải file PDF từ máy và copy vào thư mục Document1
 dst_folder = "Document1"
 os.makedirs(dst_folder, exist_ok=True)
 
-pdf_src_files = [f for f in os.listdir(src_folder) if f.endswith(".pdf")]
-file_to_copy = st.selectbox("📁 Chọn file PDF để copy sang Document1:", pdf_src_files)
+uploaded_file = st.file_uploader("📤 Chọn file PDF từ máy tính", type=["pdf"])
 
-if st.button("📥 Copy sang Document1"):
-    try:
-        shutil.copy(os.path.join(src_folder, file_to_copy), os.path.join(dst_folder, file_to_copy))
-        st.success(f"✅ Đã copy '{file_to_copy}' vào thư mục Document1.")
-    except Exception as e:
-        st.error(f"❌ Lỗi sao chép: {e}")
+if uploaded_file is not None:
+    file_name = uploaded_file.name
+    dst_path = os.path.join(dst_folder, file_name)
+
+    with open(dst_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+
+    st.success(f"✅ Đã lưu file '{file_name}' vào thư mục Document1.")
+
+
 
 # ======= CHỌN FILE TỪ Document1 =======
 pdf_files = [f for f in os.listdir(dst_folder) if f.endswith(".pdf")]
 selected_pdf = st.selectbox("📄 Chọn file PDF trong Document1:", pdf_files)
-pdf_context = extract_text_from_pdf_path(os.path.join(dst_folder, selected_pdf))
+pdf_context = extract_text_from_pdf_path(os.path.join("Document1", selected_pdf))
+
 
 # ======= SYSTEM MESSAGE BAN ĐẦU =======
 base_system = rfile("01.system_trainning.txt")
