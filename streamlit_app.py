@@ -184,9 +184,9 @@ if selected_pdf != st.session_state.last_selected_pdf:
 
 
 # ======= SYSTEM MESSAGE BAN ĐẦU =======
-=======
+# =======
 # ========== TẠO SYSTEM MESSAGE ==========
->>>>>>> parent of 7285b32 (a)
+# >>>>>>> parent of 7285b32 (a)
 base_system = rfile("01.system_trainning.txt")
 INITIAL_SYSTEM_MESSAGE = {
     "role": "system",
