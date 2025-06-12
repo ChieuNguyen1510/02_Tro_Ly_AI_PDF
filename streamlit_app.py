@@ -11,7 +11,7 @@ from pydrive2.drive import GoogleDrive
 # ========== CÀI ĐẶT GOOGLE DRIVE ==========
 gauth = GoogleAuth()
 gauth.LoadClientConfigFile('client_secrets.json')
-gauth.LocalWebserverAuth()
+gauth.CommandLineAuth()
 drive = GoogleDrive(gauth)
 FOLDER_ID = st.secrets["DRIVE_FOLDER_ID"]
 
