@@ -23,13 +23,25 @@ st.markdown("""
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "$$", right: "$$", display: true},
-            {left: "$", right: "$", display: false}
-        ],
-        throwOnError: false
+    function renderMath() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\\(", right: "\\)", display: false},
+                {left: "\\[", right: "\\]", display: true}
+            ],
+            throwOnError: false
+        });
+    }
+    renderMath(); // Initial render
+    // Observe DOM changes for dynamic content
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach(() => {
+            renderMath();
+        });
     });
+    observer.observe(document.body, { childList: true, subtree: true });
 });
 </script>
 """, unsafe_allow_html=True)
@@ -165,15 +177,6 @@ for message in st.session_state.messages:
             <img src="data:image/png;base64,{assistant_icon if message["role"] == "assistant" else user_icon}" class="icon" />
             <div class="text">{content}</div>
         </div>
-        <script>
-            renderMathInElement(document.body, {{
-                delimiters: [
-                    {{left: "$$", right: "$$", display: true}},
-                    {{left: "$", right: "$", display: false}}
-                ],
-                throwOnError: false
-            }});
-        </script>
         ''', unsafe_allow_html=True)
 
 # ======= CHAT INPUT =======
@@ -186,15 +189,6 @@ if prompt := st.chat_input("Enter your question here..."):
         <img src="data:image/png;base64,{user_icon}" class="icon" />
         <div class="text">{processed_prompt}</div>
     </div>
-    <script>
-        renderMathInElement(document.body, {{
-            delimiters: [
-                {{left: "$$", right: "$$", display: true}},
-                {{left: "$", right: "$", display: false}}
-            ],
-            throwOnError: false
-        }});
-    </script>
     ''', unsafe_allow_html=True)
 
     typing_placeholder = st.empty()
@@ -220,15 +214,6 @@ if prompt := st.chat_input("Enter your question here..."):
         <img src="data:image/png;base64,{assistant_icon}" class="icon" />
         <div class="text">{processed_response}</div>
     </div>
-    <script>
-        renderMathInElement(document.body, {{
-            delimiters: [
-                {{left: "$$", right: "$$", display: true}},
-                {{left: "$", right: "$", display: false}}
-            ],
-            throwOnError: false
-        }});
-    </script>
     ''', unsafe_allow_html=True)
 
     st.session_state.messages.append({"role": "assistant", "content": processed_response})
