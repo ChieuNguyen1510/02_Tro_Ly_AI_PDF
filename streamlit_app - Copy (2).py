@@ -16,30 +16,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Thêm KaTeX để render công thức toán học
-st.markdown("""
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjS3L5vY5EwA7zrx1ekL2ED4Cr3zR9Aeb2aL5lYZS3y7O6y0Q==" crossorigin="anonymous"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const elements = document.getElementsByClassName("text");
-    for (let element of elements) {
-        katex.render(element.innerText, element, {
-            throwOnError: false,
-            displayMode: element.tagName === "DIV" && element.classList.contains("math-display")
-        });
-    }
-});
-</script>
-<style>
-.math-display {
-    display: block;
-    text-align: center;
-    margin: 10px 0;
-}
-</style>
-""", unsafe_allow_html=True)
-
 # ======= HÀM TIỆN ÍCH =======
 def rfile(name_file):
     with open(name_file, "r", encoding="utf-8") as file:
@@ -91,10 +67,13 @@ if uploaded_file is not None:
 
     st.success(f"✅ Saved '{file_name}' go to Document folder.")
 
+
+
 # ======= CHỌN FILE TỪ Document1 =======
 pdf_files = [f for f in os.listdir(dst_folder) if f.endswith(".pdf")]
 selected_pdf = st.selectbox("📄 Select PDF file: ", pdf_files)
 pdf_context = extract_text_from_pdf_path(os.path.join("Document1", selected_pdf))
+
 
 # ======= SYSTEM MESSAGE BAN ĐẦU =======
 base_system = rfile("01.system_trainning.txt")
