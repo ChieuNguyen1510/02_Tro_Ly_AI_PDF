@@ -4,30 +4,34 @@ from base64 import b64encode
 import fitz  # PyMuPDF
 import os
 import shutil
-import streamlit.components.v1 as components
 
-# Hàm render KaTeX chính xác qua HTML component
-def render_katex(latex_string):
-    components.html(f"""
-    <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css\">
-    <script defer src=\"https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js\"></script>
-    <script defer src=\"https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js\"
-            onload=\"renderMathInElement(document.body);\">
-    </script>
-    <div style=\"font-size: 1.2em; margin: 12px 0; line-height: 1.6; white-space: pre-wrap;\">
-        {latex_string}
-    </div>
-    """, height=150)
-
-# Ẩn thanh công cụ Streamlit
+# Ẩn thanh công cụ
 st.markdown("""
 <style>
-    [data-testid=\"stToolbar\"],
-    [data-testid=\"manage-app-button\"],
-    [data-testid=\"stAppViewBlockContainer\"] > div > div > div > div > div {
+    [data-testid="stToolbar"],
+    [data-testid="manage-app-button"],
+    [data-testid="stAppViewBlockContainer"] > div > div > div > div > div {
         display: none !important;
     }
 </style>
+""", unsafe_allow_html=True)
+
+# Thêm KaTeX để render công thức toán học
+st.markdown("""
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+window.addEventListener("load", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ],
+        throwOnError: false
+    });
+});
+</script>
 """, unsafe_allow_html=True)
 
 # ======= HÀM TIỆN ÍCH =======
@@ -60,29 +64,33 @@ except:
 
 # ======= TIÊU ĐỀ =======
 title_content = rfile("00.xinchao.txt")
-st.markdown(f"""<h1 style=\"text-align: center; font-size: 24px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;\">{title_content}</h1>""", unsafe_allow_html=True)
+st.markdown(f"""<h1 style="text-align: center; font-size: 24px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;">{title_content}</h1>""", unsafe_allow_html=True)
 
 # ======= API KEY =======
 openai_api_key = st.secrets.get("OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 
-# ======= UPLOAD & CHỌN PDF =======
+# 📤 Tải file PDF từ máy và copy vào thư mục Document1
 dst_folder = "Document1"
 os.makedirs(dst_folder, exist_ok=True)
+
 uploaded_file = st.file_uploader("📤 Upload PDF file", type=["pdf"])
 
 if uploaded_file is not None:
     file_name = uploaded_file.name
     dst_path = os.path.join(dst_folder, file_name)
+
     with open(dst_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
+
     st.success(f"✅ Saved '{file_name}' to Document folder.")
 
+# ======= CHỌN FILE TỪ Document1 =======
 pdf_files = [f for f in os.listdir(dst_folder) if f.endswith(".pdf")]
 selected_pdf = st.selectbox("📄 Select PDF file: ", pdf_files)
-pdf_context = extract_text_from_pdf_path(os.path.join(dst_folder, selected_pdf))
+pdf_context = extract_text_from_pdf_path(os.path.join("Document1", selected_pdf))
 
-# ======= SYSTEM MESSAGE =======
+# ======= SYSTEM MESSAGE BAN ĐẦU =======
 base_system = rfile("01.system_trainning.txt")
 INITIAL_SYSTEM_MESSAGE = {
     "role": "system",
@@ -152,13 +160,12 @@ st.markdown("""<style>
 for message in st.session_state.messages:
     if message["role"] in ["assistant", "user"]:
         content = message["content"].replace("[", "$$").replace("]", "$$")
-        icon = assistant_icon if message["role"] == "assistant" else user_icon
         st.markdown(f'''
         <div class="message {message["role"]}">
-            <img src="data:image/png;base64,{icon}" class="icon" />
-            <div class="text">''', unsafe_allow_html=True)
-        render_katex(content)
-        st.markdown('</div></div>', unsafe_allow_html=True)
+            <img src="data:image/png;base64,{assistant_icon if message["role"] == "assistant" else user_icon}" class="icon" />
+            <div class="text">{content}</div>
+        </div>
+        ''', unsafe_allow_html=True)
 
 # ======= CHAT INPUT =======
 if prompt := st.chat_input("Enter your question here..."):
@@ -168,19 +175,21 @@ if prompt := st.chat_input("Enter your question here..."):
     st.markdown(f'''
     <div class="message user">
         <img src="data:image/png;base64,{user_icon}" class="icon" />
-        <div class="text">''', unsafe_allow_html=True)
-    render_katex(processed_prompt)
-    st.markdown('</div></div>', unsafe_allow_html=True)
+        <div class="text">{processed_prompt}</div>
+    </div>
+    ''', unsafe_allow_html=True)
 
     typing_placeholder = st.empty()
     typing_placeholder.markdown('<div class="typing">Assistant is typing...</div>', unsafe_allow_html=True)
 
+    # Gọi OpenAI API
     response = ""
     stream = client.chat.completions.create(
         model=rfile("module_chatgpt.txt").strip(),
         messages=[{"role": m["role"], "content": m["content"]} for m in st.session_state.messages],
         stream=True,
     )
+
     for chunk in stream:
         if chunk.choices:
             response += chunk.choices[0].delta.content or ""
@@ -191,8 +200,8 @@ if prompt := st.chat_input("Enter your question here..."):
     st.markdown(f'''
     <div class="message assistant">
         <img src="data:image/png;base64,{assistant_icon}" class="icon" />
-        <div class="text">''', unsafe_allow_html=True)
-    render_katex(processed_response)
-    st.markdown('</div></div>', unsafe_allow_html=True)
+        <div class="text">{processed_response}</div>
+    </div>
+    ''', unsafe_allow_html=True)
 
     st.session_state.messages.append({"role": "assistant", "content": processed_response})
