@@ -21,15 +21,23 @@ st.markdown("""
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjS3L5vY5EwA7zrx1ekL2ED4Cr3zR9Aeb2aL5lYZS3y7O6y0Q==" crossorigin="anonymous"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+function renderMath() {
     const elements = document.getElementsByClassName("text");
     for (let element of elements) {
-        katex.render(element.innerText, element, {
+        // Xử lý công thức display ($$...$$)
+        let content = element.innerHTML;
+        content = content.replace(/\[([^\]]*)\]/g, "$$$1$$"); // Chuyển [..] thành $$..$$
+        // Render tất cả nội dung với KaTeX
+        katex.render(content, element, {
             throwOnError: false,
-            displayMode: element.tagName === "DIV" && element.classList.contains("math-display")
+            displayMode: content.includes("$$")
         });
     }
-});
+}
+document.addEventListener("DOMContentLoaded", renderMath);
+// Quan sát thay đổi động trong DOM để render lại công thức
+const observer = new MutationObserver(renderMath);
+observer.observe(document.body, { childList: true, subtree: true });
 </script>
 <style>
 .math-display {
@@ -152,7 +160,7 @@ st.markdown("""<style>
         align-items: center !important;
     }
     @keyframes blink {
-        0% { opacity: 1; }
+        0% { opacity: 0.3; }
         50% { opacity: 0.5; }
         100% { opacity: 1; }
     }
@@ -200,12 +208,14 @@ for message in st.session_state.messages:
 
 # ======= CHAT INPUT =======
 if prompt := st.chat_input("Enter your question here..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    # Chuẩn hóa công thức trong input người dùng
+    processed_prompt = prompt.replace("[", "$$").replace("]", "$$")  # Chuyển [..] thành $$..$$
+    st.session_state.messages.append({"role": "user", "content": processed_prompt})
 
     st.markdown(f'''
     <div class="message user">
         <img src="data:image/png;base64,{user_icon}" class="icon" />
-        <div class="text">{prompt}</div>
+        <div class="text">{processed_prompt}</div>
     </div>
     ''', unsafe_allow_html=True)
 
@@ -224,13 +234,16 @@ if prompt := st.chat_input("Enter your question here..."):
         if chunk.choices:
             response += chunk.choices[0].delta.content or ""
 
+    # Chuẩn hóa công thức trong phản hồi của trợ lý
+    processed_response = response.replace("[", "$$").replace("]", "$$")  # Chuyển [..] thành $$..$$
+
     typing_placeholder.empty()
 
     st.markdown(f'''
     <div class="message assistant">
         <img src="data:image/png;base64,{assistant_icon}" class="icon" />
-        <div class="text">{response}</div>
+        <div class="text">{processed_response}</div>
     </div>
     ''', unsafe_allow_html=True)
 
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    st.session_state.messages.append({"role": "assistant", "content": processed_response})
