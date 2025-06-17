@@ -4,7 +4,6 @@ from base64 import b64encode
 import fitz  # PyMuPDF
 import os
 import shutil
-import html
 
 # Ẩn thanh công cụ
 st.markdown("""
@@ -37,9 +36,17 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 <style>
 .math-display {
-    display: block;
-    text-align: center;
-    margin: 10px 0;
+    display: block !important;
+    text-align: center !important;
+    margin: 15px 0 !important;
+    font-size: 1.2em !important; /* Tăng kích thước font cho công thức */
+}
+.katex {
+    font-size: 1.2em !important; /* Đảm bảo font KaTeX rõ ràng */
+}
+.message .text {
+    line-height: 1.6 !important; /* Tăng khoảng cách dòng */
+    font-size: 16px !important; /* Font chữ mặc định */
 }
 </style>
 """, unsafe_allow_html=True)
@@ -146,7 +153,7 @@ st.markdown("""<style>
     .text {
         flex: 1 !important;
         font-size: 16px !important;
-        line-height: 1.4 !important;
+        line-height: 1.6 !important;
     }
     .typing {
         font-style: italic !important;
@@ -188,7 +195,7 @@ st.markdown("""<style>
 # ======= HIỂN THỊ TIN NHẮN =======
 for message in st.session_state.messages:
     if message["role"] in ["assistant", "user"]:
-        # Thoát ký tự HTML và chuẩn hóa công thức
+        # Chuẩn hóa công thức
         content = message["content"].replace("[", "$$").replace("]", "$$")
         st.markdown(f'''
         <div class="message {message["role"]}">
