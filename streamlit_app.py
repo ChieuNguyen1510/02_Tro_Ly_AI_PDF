@@ -71,7 +71,7 @@ if uploaded_file is not None:
 
 # ======= CHỌN FILE TỪ Document1 =======
 pdf_files = [f for f in os.listdir(dst_folder) if f.endswith(".pdf")]
-selected_pdf = st.selectbox("📄 Select PDF file:", pdf_files)
+selected_pdf = st.selectbox("📄 Select PDF file: ", pdf_files)
 pdf_context = extract_text_from_pdf_path(os.path.join("Document1", selected_pdf))
 
 
