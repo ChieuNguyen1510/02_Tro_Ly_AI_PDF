@@ -65,15 +65,17 @@ if uploaded_file is not None:
     with open(dst_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    st.success(f"✅ Saved '{file_name}' go to Document folder.")
-
-
+    st.success(f"✅ Saved '{file_name}' to Document folder.")
 
 # ======= CHỌN FILE TỪ Document1 =======
 pdf_files = [f for f in os.listdir(dst_folder) if f.endswith(".pdf")]
-selected_pdf = st.selectbox("📄 Select PDF file: ", pdf_files)
-pdf_context = extract_text_from_pdf_path(os.path.join("Document1", selected_pdf))
+selected_pdf = st.selectbox("📄 Select PDF file: ", pdf_files, key="pdf_selectbox")
 
+# Cập nhật pdf_context khi selected_pdf thay đổi
+if selected_pdf:
+    pdf_context = extract_text_from_pdf_path(os.path.join("Document1", selected_pdf))
+else:
+    pdf_context = ""
 
 # ======= SYSTEM MESSAGE BAN ĐẦU =======
 base_system = rfile("01.system_trainning.txt")
@@ -86,6 +88,10 @@ INITIAL_ASSISTANT_MESSAGE = {"role": "assistant", "content": rfile("02.assistant
 # ======= SESSION STATE =======
 if "messages" not in st.session_state:
     st.session_state.messages = [INITIAL_SYSTEM_MESSAGE, INITIAL_ASSISTANT_MESSAGE]
+
+# Cập nhật system message khi pdf_context thay đổi
+if st.session_state.messages[0]["role"] == "system":
+    st.session_state.messages[0] = INITIAL_SYSTEM_MESSAGE
 
 if st.button("New chat"):
     st.session_state.messages = [INITIAL_SYSTEM_MESSAGE, INITIAL_ASSISTANT_MESSAGE]
@@ -189,7 +195,7 @@ if prompt := st.chat_input("Enter your question here..."):
     ''', unsafe_allow_html=True)
 
     typing_placeholder = st.empty()
-    typing_placeholder.markdown('<div class="typing">Assistant is typing..</div>', unsafe_allow_html=True)
+    typing_placeholder.markdown('<div class="typing">Assistant is typing...</div>', unsafe_allow_html=True)
 
     # Gọi OpenAI API (streaming)
     response = ""
