@@ -21,6 +21,20 @@ st.markdown("""
 st.markdown("""
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjS3L5vY5EwA7zrx1ekL2ED4Cr3zR9Aeb2aL5lYZS3y7O6y0Q==" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0I+U7KLF+wdgH1kO" crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\\[", right: "\\]", display: true},
+            {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+    });
+});
+</script>
 <style>
 .math-display {
     display: block;
@@ -174,8 +188,8 @@ st.markdown("""<style>
 # ======= HIỂN THỊ TIN NHẮN =======
 for message in st.session_state.messages:
     if message["role"] in ["assistant", "user"]:
-        # Thoát ký tự HTML để tránh lỗi và chuẩn hóa công thức
-        content = html.escape(message["content"]).replace("[", "$$").replace("]", "$$")
+        # Thoát ký tự HTML và chuẩn hóa công thức
+        content = message["content"].replace("[", "$$").replace("]", "$$")
         st.markdown(f'''
         <div class="message {message["role"]}">
             <img src="data:image/png;base64,{assistant_icon if message["role"] == "assistant" else user_icon}" class="icon" />
@@ -185,8 +199,8 @@ for message in st.session_state.messages:
 
 # ======= CHAT INPUT =======
 if prompt := st.chat_input("Enter your question here..."):
-    # Thoát ký tự HTML và chuẩn hóa công thức trong input người dùng
-    processed_prompt = html.escape(prompt).replace("[", "$$").replace("]", "$$")
+    # Chuẩn hóa công thức trong input người dùng
+    processed_prompt = prompt.replace("[", "$$").replace("]", "$$")
     st.session_state.messages.append({"role": "user", "content": processed_prompt})
 
     st.markdown(f'''
@@ -211,8 +225,8 @@ if prompt := st.chat_input("Enter your question here..."):
         if chunk.choices:
             response += chunk.choices[0].delta.content or ""
 
-    # Thoát ký tự HTML và chuẩn hóa công thức trong phản hồi của trợ lý
-    processed_response = html.escape(response).replace("[", "$$").replace("]", "$$")
+    # Chuẩn hóa công thức trong phản hồi của trợ lý
+    processed_response = response.replace("[", "$$").replace("]", "$$")
 
     typing_placeholder.empty()
 
