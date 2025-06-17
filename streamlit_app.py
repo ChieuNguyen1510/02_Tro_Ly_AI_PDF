@@ -56,7 +56,7 @@ client = OpenAI(api_key=openai_api_key)
 dst_folder = "Document1"
 os.makedirs(dst_folder, exist_ok=True)
 
-uploaded_file = st.file_uploader("📤 Chọn file PDF từ máy tính", type=["pdf"])
+uploaded_file = st.file_uploader("📤 Upload PDF file", type=["pdf"])
 
 if uploaded_file is not None:
     file_name = uploaded_file.name
@@ -65,13 +65,13 @@ if uploaded_file is not None:
     with open(dst_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    st.success(f"✅ Đã lưu file '{file_name}' vào thư mục Document1.")
+    st.success(f"✅ Saved '{file_name}' go to Document folder.")
 
 
 
 # ======= CHỌN FILE TỪ Document1 =======
 pdf_files = [f for f in os.listdir(dst_folder) if f.endswith(".pdf")]
-selected_pdf = st.selectbox("📄 Chọn file PDF trong Document1:", pdf_files)
+selected_pdf = st.selectbox("📄 Select PDF file:", pdf_files)
 pdf_context = extract_text_from_pdf_path(os.path.join("Document1", selected_pdf))
 
 
@@ -79,7 +79,7 @@ pdf_context = extract_text_from_pdf_path(os.path.join("Document1", selected_pdf)
 base_system = rfile("01.system_trainning.txt")
 INITIAL_SYSTEM_MESSAGE = {
     "role": "system",
-    "content": f"{base_system}\n\nTài liệu tham khảo từ PDF:\n{pdf_context[:8000]}"
+    "content": f"{base_system}\n\nreferent from PDF:\n{pdf_context[:8000]}"
 }
 INITIAL_ASSISTANT_MESSAGE = {"role": "assistant", "content": rfile("02.assistant.txt")}
 
