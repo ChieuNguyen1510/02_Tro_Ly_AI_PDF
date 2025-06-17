@@ -4,6 +4,7 @@ from base64 import b64encode
 import fitz  # PyMuPDF
 import os
 import shutil
+import html
 
 # Ẩn thanh công cụ
 st.markdown("""
@@ -76,7 +77,7 @@ if uploaded_file is not None:
     dst_path = os.path.join(dst_folder, file_name)
 
     with open(dst_path, "wb") as f:
-        f.write(uploadated_file.getbuffer())
+        f.write(uploaded_file.getbuffer())
 
     st.success(f"✅ Saved '{file_name}' go to Document folder.")
 
@@ -172,9 +173,9 @@ st.markdown("""<style>
 
 # ======= HIỂN THỊ TIN NHẮN =======
 for message in st.session_state.messages:
-    if message["role"] == "assistant" or message["role"] == "user":
-        # Chuẩn hóa nội dung tin nhắn để đảm bảo công thức được bao quanh bởi $$...$$
-        content = message["content"].replace("[", "$$").replace("]", "$$")
+    if message["role"] in ["assistant", "user"]:
+        # Thoát ký tự HTML để tránh lỗi và chuẩn hóa công thức
+        content = html.escape(message["content"]).replace("[", "$$").replace("]", "$$")
         st.markdown(f'''
         <div class="message {message["role"]}">
             <img src="data:image/png;base64,{assistant_icon if message["role"] == "assistant" else user_icon}" class="icon" />
@@ -184,8 +185,8 @@ for message in st.session_state.messages:
 
 # ======= CHAT INPUT =======
 if prompt := st.chat_input("Enter your question here..."):
-    # Chuẩn hóa công thức trong input người dùng
-    processed_prompt = prompt.replace("[", "$$").replace("]", "$$")  # Chuyển [..] thành $$..$$
+    # Thoát ký tự HTML và chuẩn hóa công thức trong input người dùng
+    processed_prompt = html.escape(prompt).replace("[", "$$").replace("]", "$$")
     st.session_state.messages.append({"role": "user", "content": processed_prompt})
 
     st.markdown(f'''
@@ -210,8 +211,8 @@ if prompt := st.chat_input("Enter your question here..."):
         if chunk.choices:
             response += chunk.choices[0].delta.content or ""
 
-    # Chuẩn hóa công thức trong phản hồi của trợ lý
-    processed_response = response.replace("[", "$$").replace("]", "$$")  # Chuyển [..] thành $$..$$
+    # Thoát ký tự HTML và chuẩn hóa công thức trong phản hồi của trợ lý
+    processed_response = html.escape(response).replace("[", "$$").replace("]", "$$")
 
     typing_placeholder.empty()
 
