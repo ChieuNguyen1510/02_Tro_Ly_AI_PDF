@@ -18,37 +18,20 @@ st.markdown("""
 
 # Thêm KaTeX để render công thức toán học
 st.markdown("""
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjS3L5vY5EwA7zrx1ekL2ED4Cr3zR9Aeb2aL5lYZS3y7O6y0Q==" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0I+U7KLF+wdgH1kO" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     renderMathInElement(document.body, {
         delimiters: [
             {left: "$$", right: "$$", display: true},
-            {left: "$", right: "$", display: false},
-            {left: "\\[", right: "\\]", display: true},
-            {left: "\\(", right: "\\)", display: false}
+            {left: "$", right: "$", display: false}
         ],
         throwOnError: false
     });
 });
 </script>
-<style>
-.math-display {
-    display: block !important;
-    text-align: center !important;
-    margin: 15px 0 !important;
-    font-size: 1.2em !important; /* Tăng kích thước font cho công thức */
-}
-.katex {
-    font-size: 1.2em !important; /* Đảm bảo font KaTeX rõ ràng */
-}
-.message .text {
-    line-height: 1.6 !important; /* Tăng khoảng cách dòng */
-    font-size: 16px !important; /* Font chữ mặc định */
-}
-</style>
 """, unsafe_allow_html=True)
 
 # ======= HÀM TIỆN ÍCH =======
@@ -100,7 +83,7 @@ if uploaded_file is not None:
     with open(dst_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    st.success(f"✅ Saved '{file_name}' go to Document folder.")
+    st.success(f"✅ Saved '{file_name}' to Document folder.")
 
 # ======= CHỌN FILE TỪ Document1 =======
 pdf_files = [f for f in os.listdir(dst_folder) if f.endswith(".pdf")]
@@ -125,88 +108,76 @@ if st.button("New chat"):
 
 # ======= CSS GIAO DIỆN =======
 st.markdown("""<style>
-    .message {
-        padding: 12px !important;
-        border-radius: 12px !important;
-        max-width: 75% !important;
-        display: flex !important;
-        align-items: flex-start !important;
-        gap: 12px !important;
-        margin: 8px 0 !important;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-    }
-    .assistant {
-        background-color: #f0f7ff !important;
-    }
-    .user {
-        background-color: #e6ffe6 !important;
-        text-align: right !important;
-        margin-left: auto !important;
-        flex-direction: row-reverse !important;
-    }
-    .icon {
-        width: 32px !important;
-        height: 32px !important;
-        border-radius: 50% !important;
-        border: 1px solid #ddd !important;
-    }
-    .text {
-        flex: 1 !important;
-        font-size: 16px !important;
-        line-height: 1.6 !important;
-    }
-    .typing {
-        font-style: italic !important;
-        color: #888 !important;
-        padding: 5px 10px !important;
-        display: flex !important;
-        align-items: center !important;
-    }
-    @keyframes blink {
-        0% { opacity: 0.3; }
-        50% { opacity: 0.5; }
-        100% { opacity: 1; }
-    }
-    .typing::after {
-        content: "..." !important;
-        animation: blink 1s infinite !important;
-    }
-    [data-testid="stChatInput"] {
-        border: 2px solid #ddd !important;
-        border-radius: 8px !important;
-        padding: 8px !important;
-        background-color: #fafafa !important;
-    }
-    div.stButton > button {
-        background-color: #4CAF50 !important;
-        color: white !important;
-        border-radius: 2px solid #FFFFFF !important;
-        padding: 6px 6px !important;
-        font-size: 14px !important;
-        border: none !important;
-        display: block !important;
-        margin: 10px 0px !important;
-    }
-    div.stButton > button:hover {
-        background-color: #45a049 !important;
-    }
+.message {
+    padding: 12px !important;
+    border-radius: 12px !important;
+    max-width: 75% !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    margin: 8px 0 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+.assistant {
+    background-color: #f0f7ff !important;
+}
+.user {
+    background-color: #e6ffe6 !important;
+    text-align: right !important;
+    margin-left: auto !important;
+    flex-direction: row-reverse !important;
+}
+.icon {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    border: 1px solid #ddd !important;
+}
+.text {
+    flex: 1 !important;
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+}
+.typing {
+    font-style: italic !important;
+    color: #888 !important;
+    padding: 5px 10px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+@keyframes blink {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+.typing::after {
+    content: "..." !important;
+    animation: blink 1s infinite !important;
+}
 </style>""", unsafe_allow_html=True)
 
 # ======= HIỂN THỊ TIN NHẮN =======
 for message in st.session_state.messages:
     if message["role"] in ["assistant", "user"]:
-        # Chuẩn hóa công thức
         content = message["content"].replace("[", "$$").replace("]", "$$")
         st.markdown(f'''
         <div class="message {message["role"]}">
             <img src="data:image/png;base64,{assistant_icon if message["role"] == "assistant" else user_icon}" class="icon" />
             <div class="text">{content}</div>
         </div>
+        <script>
+            renderMathInElement(document.body, {{
+                delimiters: [
+                    {{left: "$$", right: "$$", display: true}},
+                    {{left: "$", right: "$", display: false}}
+                ],
+                throwOnError: false
+            }});
+        </script>
         ''', unsafe_allow_html=True)
 
 # ======= CHAT INPUT =======
 if prompt := st.chat_input("Enter your question here..."):
-    # Chuẩn hóa công thức trong input người dùng
     processed_prompt = prompt.replace("[", "$$").replace("]", "$$")
     st.session_state.messages.append({"role": "user", "content": processed_prompt})
 
@@ -215,12 +186,21 @@ if prompt := st.chat_input("Enter your question here..."):
         <img src="data:image/png;base64,{user_icon}" class="icon" />
         <div class="text">{processed_prompt}</div>
     </div>
+    <script>
+        renderMathInElement(document.body, {{
+            delimiters: [
+                {{left: "$$", right: "$$", display: true}},
+                {{left: "$", right: "$", display: false}}
+            ],
+            throwOnError: false
+        }});
+    </script>
     ''', unsafe_allow_html=True)
 
     typing_placeholder = st.empty()
     typing_placeholder.markdown('<div class="typing">Assistant is typing...</div>', unsafe_allow_html=True)
 
-    # Gọi OpenAI API (streaming)
+    # Gọi OpenAI API
     response = ""
     stream = client.chat.completions.create(
         model=rfile("module_chatgpt.txt").strip(),
@@ -232,9 +212,7 @@ if prompt := st.chat_input("Enter your question here..."):
         if chunk.choices:
             response += chunk.choices[0].delta.content or ""
 
-    # Chuẩn hóa công thức trong phản hồi của trợ lý
     processed_response = response.replace("[", "$$").replace("]", "$$")
-
     typing_placeholder.empty()
 
     st.markdown(f'''
@@ -242,6 +220,15 @@ if prompt := st.chat_input("Enter your question here..."):
         <img src="data:image/png;base64,{assistant_icon}" class="icon" />
         <div class="text">{processed_response}</div>
     </div>
+    <script>
+        renderMathInElement(document.body, {{
+            delimiters: [
+                {{left: "$$", right: "$$", display: true}},
+                {{left: "$", right: "$", display: false}}
+            ],
+            throwOnError: false
+        }});
+    </script>
     ''', unsafe_allow_html=True)
 
     st.session_state.messages.append({"role": "assistant", "content": processed_response})
