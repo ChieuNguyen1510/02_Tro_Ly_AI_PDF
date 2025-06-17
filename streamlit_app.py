@@ -20,25 +20,6 @@ st.markdown("""
 st.markdown("""
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjS3L5vY5EwA7zrx1ekL2ED4Cr3zR9Aeb2aL5lYZS3y7O6y0Q==" crossorigin="anonymous"></script>
-<script>
-function renderMath() {
-    const elements = document.getElementsByClassName("text");
-    for (let element of elements) {
-        // Xử lý công thức display ($$...$$)
-        let content = element.innerHTML;
-        content = content.replace(/\[([^\]]*)\]/g, "$$$1$$"); // Chuyển [..] thành $$..$$
-        // Render tất cả nội dung với KaTeX
-        katex.render(content, element, {
-            throwOnError: false,
-            displayMode: content.includes("$$")
-        });
-    }
-}
-document.addEventListener("DOMContentLoaded", renderMath);
-// Quan sát thay đổi động trong DOM để render lại công thức
-const observer = new MutationObserver(renderMath);
-observer.observe(document.body, { childList: true, subtree: true });
-</script>
 <style>
 .math-display {
     display: block;
@@ -95,7 +76,7 @@ if uploaded_file is not None:
     dst_path = os.path.join(dst_folder, file_name)
 
     with open(dst_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
+        f.write(uploadated_file.getbuffer())
 
     st.success(f"✅ Saved '{file_name}' go to Document folder.")
 
@@ -191,18 +172,13 @@ st.markdown("""<style>
 
 # ======= HIỂN THỊ TIN NHẮN =======
 for message in st.session_state.messages:
-    if message["role"] == "assistant":
+    if message["role"] == "assistant" or message["role"] == "user":
+        # Chuẩn hóa nội dung tin nhắn để đảm bảo công thức được bao quanh bởi $$...$$
+        content = message["content"].replace("[", "$$").replace("]", "$$")
         st.markdown(f'''
-        <div class="message assistant">
-            <img src="data:image/png;base64,{assistant_icon}" class="icon" />
-            <div class="text">{message["content"]}</div>
-        </div>
-        ''', unsafe_allow_html=True)
-    elif message["role"] == "user":
-        st.markdown(f'''
-        <div class="message user">
-            <img src="data:image/png;base64,{user_icon}" class="icon" />
-            <div class="text">{message["content"]}</div>
+        <div class="message {message["role"]}">
+            <img src="data:image/png;base64,{assistant_icon if message["role"] == "assistant" else user_icon}" class="icon" />
+            <div class="text">{content}</div>
         </div>
         ''', unsafe_allow_html=True)
 
@@ -220,7 +196,7 @@ if prompt := st.chat_input("Enter your question here..."):
     ''', unsafe_allow_html=True)
 
     typing_placeholder = st.empty()
-    typing_placeholder.markdown('<div class="typing">Assistant is typing..</div>', unsafe_allow_html=True)
+    typing_placeholder.markdown('<div class="typing">Assistant is typing...</div>', unsafe_allow_html=True)
 
     # Gọi OpenAI API (streaming)
     response = ""
